@@ -50,6 +50,14 @@ public class Tag implements BaseEntity<Long> {
 		this.name = name;
 	}
 
+	public List<News> getNews() {
+		return news;
+	}
+
+	public void setNews(final List<News> news) {
+		this.news = news;
+	}
+
 	@Override
 	public String toString() {
 		return "Tag{id=" + id +
@@ -66,11 +74,8 @@ public class Tag implements BaseEntity<Long> {
 			return false;
 		}
 		final Tag tag = (Tag) o;
-
-		if (!Objects.equals(id, tag.id)) {
-			return false;
-		}
-		return Objects.equals(name, tag.name);
+		return Objects.equals(id, tag.id)
+			&& Objects.equals(name, tag.name);
 	}
 
 	@Override

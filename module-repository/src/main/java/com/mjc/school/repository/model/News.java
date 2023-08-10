@@ -4,6 +4,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -15,13 +16,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name="News")
+@Table(name = "News")
 @EntityListeners(AuditingEntityListener.class)
 public class News implements BaseEntity<Long> {
 
@@ -47,6 +49,8 @@ public class News implements BaseEntity<Long> {
 		joinColumns = @JoinColumn(name = "news_id"),
 		inverseJoinColumns = @JoinColumn(name = "tag_id"))
 	private List<Tag> tags;
+	@OneToMany(mappedBy = "news", cascade = CascadeType.REMOVE)
+	private List<Comment> comments;
 
 	public News() {
 		// Empty. Used by JPA
@@ -69,7 +73,8 @@ public class News implements BaseEntity<Long> {
 		final LocalDateTime createDate,
 		final LocalDateTime lastUpdateDate,
 		final Author author,
-		final List<Tag> tags
+		final List<Tag> tags,
+		final List<Comment> comments
 	) {
 		this.id = id;
 		this.title = title;
@@ -78,6 +83,7 @@ public class News implements BaseEntity<Long> {
 		this.lastUpdateDate = lastUpdateDate;
 		this.author = author;
 		this.tags = tags;
+		this.comments = comments;
 	}
 
 	public String getTitle() {
@@ -128,6 +134,14 @@ public class News implements BaseEntity<Long> {
 		this.tags = tags;
 	}
 
+	public List<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(final List<Comment> comments) {
+		this.comments = comments;
+	}
+
 	@Override
 	public String toString() {
 		return "News{id=" + id +
@@ -137,6 +151,7 @@ public class News implements BaseEntity<Long> {
 			", lastUpdateDate=" + lastUpdateDate +
 			", author=" + author.toString() +
 			", tags=" + tags.toString() +
+			", comments=" + comments.toString() +
 			'}';
 	}
 

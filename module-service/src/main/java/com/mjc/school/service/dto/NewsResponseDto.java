@@ -10,7 +10,8 @@ public record NewsResponseDto(
 	LocalDateTime createDate,
 	LocalDateTime lastUpdateDate,
 	Long authorId,
-	List<Long> tags
+	List<Long> tags,
+	List<Long> comments
 ) {
 	// Empty
 }

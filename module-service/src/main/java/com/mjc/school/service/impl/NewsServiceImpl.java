@@ -22,15 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mjc.school.service.constants.Constants.AUTHOR_ENTITY_NAME;
 import static com.mjc.school.service.constants.Constants.ID_VALUE_MIN;
+import static com.mjc.school.service.constants.Constants.NEWS_ENTITY_NAME;
+import static com.mjc.school.service.constants.Constants.TAG_ENTITY_NAME;
 import static com.mjc.school.service.exception.ServiceErrorCode.ENTITY_NOT_FOUND_BY_ID;
 
 @Service
 public class NewsServiceImpl implements NewsService {
-
-	private static final String AUTHOR_ENTITY_NAME = "author";
-	private static final String NEWS_ENTITY_NAME = "news";
-	private static final String TAG_ENTITY_NAME = "tag";
 
 	private final AuthorRepository authorRepository;
 	private final NewsRepository newsRepository;
@@ -54,17 +53,18 @@ public class NewsServiceImpl implements NewsService {
 	public NewsResponseDto create(@NotNull @Valid final NewsRequestDto request) throws EntityNotFoundException {
 		final News news = mapper.dtoToModel(request);
 		news.setAuthor(getAuthor(request.authorId()));
-		List<Long> tagIds = request.tags();
+		final List<Long> tagIds = request.tags();
 		if (tagIds != null) {
 			news.setTags(getTags(tagIds));
 		}
+		news.setComments(new ArrayList<>());
 		return mapper.modelToDto(newsRepository.create(news));
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public NewsResponseDto readById(@NotNull @Min(ID_VALUE_MIN) final Long id) throws EntityNotFoundException {
-		Optional<News> news = newsRepository.readById(id);
+		final Optional<News> news = newsRepository.readById(id);
 		if (news.isPresent()) {
 			return mapper.modelToDto(news.get());
 		} else {
@@ -95,7 +95,7 @@ public class NewsServiceImpl implements NewsService {
 		if (id != null) {
 			final Optional<News> news = newsRepository.readById(id);
 			if (news.isPresent()) {
-				News updated = news.get();
+				final News updated = news.get();
 				updated.setTitle(request.title());
 				updated.setContent(request.content());
 				updated.setAuthor(getAuthor(request.authorId()));

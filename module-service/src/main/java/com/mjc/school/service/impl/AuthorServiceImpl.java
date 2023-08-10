@@ -17,14 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mjc.school.service.constants.Constants.AUTHOR_ENTITY_NAME;
 import static com.mjc.school.service.constants.Constants.ID_VALUE_MIN;
+import static com.mjc.school.service.constants.Constants.NEWS_ENTITY_NAME;
 import static com.mjc.school.service.exception.ServiceErrorCode.ENTITY_NOT_FOUND_BY_ID;
 
 @Service
 public class AuthorServiceImpl implements AuthorService {
-
-	private static final String AUTHOR_ENTITY_NAME = "author";
-	private static final String NEWS_ENTITY_NAME = "news";
 
 	private final AuthorRepository authorRepository;
 	private final NewsRepository newsRepository;

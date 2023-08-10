@@ -20,13 +20,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mjc.school.service.constants.Constants.ID_VALUE_MIN;
+import static com.mjc.school.service.constants.Constants.NEWS_ENTITY_NAME;
+import static com.mjc.school.service.constants.Constants.TAG_ENTITY_NAME;
 import static com.mjc.school.service.exception.ServiceErrorCode.ENTITY_NOT_FOUND_BY_ID;
 
 @Service
 public class TagServiceImpl implements TagService {
-
-	private static final String NEWS_ENTITY_NAME = "news";
-	private static final String TAG_ENTITY_NAME = "tag";
 
 	private final NewsRepository newsRepository;
 	private final TagRepository tagRepository;
@@ -103,7 +102,7 @@ public class TagServiceImpl implements TagService {
 		if (tagRepository.existById(id)) {
 			NewsSearchQueryParams params =
 				new NewsSearchQueryParams(null, List.of(id), null, null, null);
-			List<News> newsWithTag = newsRepository.readByParams(params);
+			final List<News> newsWithTag = newsRepository.readByParams(params);
 			for (News news : newsWithTag) {
 				news.getTags().removeIf(t -> id.equals(t.getId()));
 				newsRepository.update(news);

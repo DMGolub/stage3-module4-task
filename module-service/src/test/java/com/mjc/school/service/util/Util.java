@@ -1,10 +1,13 @@
 package com.mjc.school.service.util;
 
 import com.mjc.school.repository.model.Author;
+import com.mjc.school.repository.model.Comment;
 import com.mjc.school.repository.model.News;
 import com.mjc.school.repository.model.Tag;
 import com.mjc.school.service.dto.AuthorRequestDto;
 import com.mjc.school.service.dto.AuthorResponseDto;
+import com.mjc.school.service.dto.CommentRequestDto;
+import com.mjc.school.service.dto.CommentResponseDto;
 import com.mjc.school.service.dto.NewsRequestDto;
 import com.mjc.school.service.dto.NewsResponseDto;
 import com.mjc.school.service.dto.TagRequestDto;
@@ -66,6 +69,7 @@ public final class Util {
 			LocalDateTime.of(2023, 7, 17, 16, 30, 0),
 			LocalDateTime.of(2023, 7, 17, 16, 30, 0),
 			Util.createTestAuthor(1L),
+			null,
 			null
 		);
 	}
@@ -82,6 +86,7 @@ public final class Util {
 			news.getCreateDate(),
 			news.getLastUpdateDate(),
 			news.getAuthor().getId(),
+			null,
 			null
 		);
 	}
@@ -94,6 +99,7 @@ public final class Util {
 			null,
 			null,
 			createTestAuthor(newsRequestDto.authorId()),
+			null,
 			null
 		);
 	}
@@ -124,5 +130,49 @@ public final class Util {
 		return Tags.stream()
 			.map(Util::tagToDTO)
 			.collect(Collectors.toList());
+	}
+
+	public static CommentRequestDto createTestCommentRequest(final Long commentId) {
+		return new CommentRequestDto(
+			commentId,
+			"Comment Content",
+			null
+		);
+	}
+
+	public static Comment createTestComment(final Long commentId) {
+		return new Comment(
+			commentId,
+			"Comment content",
+			null,
+			null,
+			null
+		);
+	}
+
+	public static CommentResponseDto commentToDto(final Comment comment) {
+		return new CommentResponseDto(
+			comment.getId(),
+			comment.getContent(),
+			comment.getNews().getId(),
+			comment.getCreateDate(),
+			comment.getLastUpdateDate()
+		);
+	}
+
+	public static Comment dtoToComment(final CommentRequestDto request) {
+		return new Comment(
+			request.id(),
+			request.content(),
+			createTestNews(request.newsId()),
+			null,
+			null
+		);
+	}
+
+	public static List<CommentResponseDto> commentListToDtoList(final List<Comment> comments) {
+		return comments.stream()
+			.map(Util::commentToDto)
+			.toList();
 	}
 }

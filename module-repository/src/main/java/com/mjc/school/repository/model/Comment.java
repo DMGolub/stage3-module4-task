@@ -4,52 +4,53 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "Author")
+@Table(name = "Comment")
 @EntityListeners(AuditingEntityListener.class)
-public class Author implements BaseEntity<Long> {
+public class Comment implements BaseEntity<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "author_id")
+	@Column(name = "commentId")
 	private Long id;
-	@Column(name = "author_name", nullable = false)
-	private String name;
+	@Column(name = "comment_content", nullable = false)
+	private String content;
+	@ManyToOne
+	@JoinColumn(name = "news_id")
+	private News news;
 	@CreatedDate
-	@Column(name = "author_create_date", nullable = false)
+	@Column(name = "comment_create_date", nullable = false)
 	private LocalDateTime createDate;
 	@LastModifiedDate
-	@Column(name = "author_last_update_date", nullable = false)
+	@Column(name = "comment_last_update_date", nullable = false)
 	private LocalDateTime lastUpdateDate;
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.REMOVE)
-	private List<News> news;
 
-	public Author() {
+	public Comment() {
 		// Empty. Used by JPA
 	}
 
-	public Author(
+	public Comment(
 		final Long id,
-		final String name,
+		final String content,
+		final News news,
 		final LocalDateTime createDate,
 		final LocalDateTime lastUpdateDate
 	) {
 		this.id = id;
-		this.name = name;
+		this.content = content;
+		this.news = news;
 		this.createDate = createDate;
 		this.lastUpdateDate = lastUpdateDate;
 	}
@@ -64,12 +65,20 @@ public class Author implements BaseEntity<Long> {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getContent() {
+		return content;
 	}
 
-	public void setName(final String name) {
-		this.name = name;
+	public void setContent(final String content) {
+		this.content = content;
+	}
+
+	public News getNews() {
+		return news;
+	}
+
+	public void setNews(final News news) {
+		this.news = news;
 	}
 
 	public LocalDateTime getCreateDate() {
@@ -88,21 +97,13 @@ public class Author implements BaseEntity<Long> {
 		this.lastUpdateDate = lastUpdateDate;
 	}
 
-	public List<News> getNews() {
-		return news;
-	}
-
-	public void setNews(final List<News> news) {
-		this.news = news;
-	}
-
 	@Override
 	public String toString() {
-		return "Author{id=" + id +
-			", name='" + name + '\'' +
+		return "Comment{id=" + id +
+			", content='" + content + '\'' +
+			", newsId=" + news.getId() +
 			", createDate=" + createDate +
 			", lastUpdateDate=" + lastUpdateDate +
-			", news=" + news +
 			'}';
 	}
 
@@ -114,15 +115,16 @@ public class Author implements BaseEntity<Long> {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		final Author that = (Author) o;
-		return Objects.equals(id, that.id)
-			&& Objects.equals(name, that.name)
-			&& Objects.equals(createDate, that.createDate)
-			&& Objects.equals(lastUpdateDate, that.lastUpdateDate);
+
+		final Comment comment = (Comment) o;
+		return Objects.equals(id, comment.id)
+			&& Objects.equals(content, comment.content)
+			&& Objects.equals(createDate, comment.createDate)
+			&& Objects.equals(lastUpdateDate, comment.lastUpdateDate);
 	}
 
 	@Override
 	public int hashCode() {
-		return 17;
+		return 37;
 	}
 }

@@ -136,6 +136,7 @@ public class NewsServiceImplAopTest {
 				date,
 				date,
 				Util.createTestAuthor(request.authorId()),
+				new ArrayList<>(),
 				new ArrayList<>()
 			);
 			when(newsRepository.create(any())).thenReturn(savedNews);
@@ -286,6 +287,7 @@ public class NewsServiceImplAopTest {
 				LocalDateTime.of(2023, 7, 17, 16, 30, 0),
 				LocalDateTime.now(),
 				Util.createTestAuthor(2L),
+				new ArrayList<>(),
 				new ArrayList<>()
 			);
 			when(authorRepository.existById(request.authorId())).thenReturn(true);

@@ -1,12 +1,15 @@
 package com.mjc.school.service;
 
 import com.mjc.school.repository.AuthorRepository;
+import com.mjc.school.repository.CommentRepository;
 import com.mjc.school.repository.NewsRepository;
 import com.mjc.school.repository.TagRepository;
 import com.mjc.school.repository.impl.AuthorRepositoryImpl;
+import com.mjc.school.repository.impl.CommentRepositoryImpl;
 import com.mjc.school.repository.impl.NewsRepositoryImpl;
 import com.mjc.school.repository.impl.TagRepositoryImpl;
 import com.mjc.school.service.mapper.AuthorMapper;
+import com.mjc.school.service.mapper.CommentMapper;
 import com.mjc.school.service.mapper.NewsMapper;
 import com.mjc.school.service.mapper.TagMapper;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +33,12 @@ public class ServiceAopTestConfiguration {
 
 	@Bean
 	@Primary
+	public CommentRepository commentRepository() {
+		return mock(CommentRepositoryImpl.class);
+	}
+
+	@Bean
+	@Primary
 	public NewsRepository newsRepository() {
 		return mock(NewsRepositoryImpl.class);
 	}
@@ -44,6 +53,12 @@ public class ServiceAopTestConfiguration {
 	@Primary
 	public AuthorMapper authorMapper() {
 		return mock(AuthorMapper.class);
+	}
+
+	@Bean
+	@Primary
+	public CommentMapper commentMapper() {
+		return mock(CommentMapper.class);
 	}
 
 	@Bean

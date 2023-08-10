@@ -24,7 +24,14 @@ public enum Operations {
 	GET_TAGS_BY_NEWS_ID(15, "Get tags by news id"),
 	CREATE_TAG(16, "Create tag"),
 	UPDATE_TAG(17, "Update tag"),
-	REMOVE_TAG_BY_ID(18, "Remove tag by id");
+	REMOVE_TAG_BY_ID(18, "Remove tag by id"),
+	// comment commands
+	GET_ALL_COMMENTS(19, "Get all comments"),
+	GET_COMMENT_BY_ID(20, "Get comment by id"),
+	GET_COMMENTS_BY_NEWS_ID(21, "Get comments by news id"),
+	CREATE_COMMENT(22, "Create comment"),
+	UPDATE_COMMENT(23, "Update comment"),
+	REMOVE_COMMENT_BY_ID(24, "Remove comment by id");
 
 	private final int operationNumber;
 	private final String operation;

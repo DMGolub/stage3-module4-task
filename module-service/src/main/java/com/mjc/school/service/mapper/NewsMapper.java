@@ -1,5 +1,6 @@
 package com.mjc.school.service.mapper;
 
+import com.mjc.school.repository.model.Comment;
 import com.mjc.school.repository.model.News;
 import com.mjc.school.repository.model.Tag;
 import com.mjc.school.repository.query.NewsSearchQueryParams;
@@ -16,8 +17,14 @@ public interface NewsMapper {
 
 	@Mapping(source = "news.author.id", target = "authorId")
 	@Mapping(source = "news.tags", target = "tags")
+	@Mapping(source = "news.comments", target = "comments")
 	@Mapping(target = "s", ignore = true)
+	@Mapping(target = "ments", ignore = true)
 	NewsResponseDto modelToDto(News news);
+
+	default Long map(Comment comment) {
+		return comment.getId();
+	}
 
 	default Long map(Tag tag) {
 		return tag.getId();
@@ -29,6 +36,7 @@ public interface NewsMapper {
 	@Mapping(target = "lastUpdateDate", ignore = true)
 	@Mapping(target = "author", ignore = true)
 	@Mapping(target = "tags", ignore = true)
+	@Mapping(target = "comments", ignore = true)
 	News dtoToModel(NewsRequestDto request);
 
 	@Mapping(target = "names", ignore = true)
