@@ -1,9 +1,9 @@
 package com.mjc.school.controller.impl;
 
-import com.mjc.school.controller.interfaces.AuthorController;
-import com.mjc.school.service.AuthorService;
-import com.mjc.school.service.dto.AuthorRequestDto;
-import com.mjc.school.service.dto.AuthorResponseDto;
+import com.mjc.school.controller.BaseController;
+import com.mjc.school.service.CommentService;
+import com.mjc.school.service.dto.CommentRequestDto;
+import com.mjc.school.service.dto.CommentResponseDto;
 import com.mjc.school.service.validator.annotation.Min;
 import com.mjc.school.service.validator.annotation.NotNull;
 import com.mjc.school.service.validator.annotation.Valid;
@@ -17,75 +17,78 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 import static com.mjc.school.controller.constants.Constants.API_V1_VERSION;
-import static com.mjc.school.controller.impl.AuthorControllerImpl.BASE_URI;
+import static com.mjc.school.controller.impl.CommentController.BASE_URI;
 import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 
 @RestController
 @RequestMapping(value = BASE_URI, produces = {"application/JSON"})
-public class AuthorControllerImpl implements AuthorController {
+public class CommentController implements BaseController<CommentResponseDto, CommentRequestDto, Long> {
 
 	public static final String BASE_URI = "/api/" + API_V1_VERSION;
-	public static final String ENTITY_BASE_URI = "/authors";
+	public static final String ENTITY_BASE_URI = "/comments";
 
-	private final AuthorService authorService;
+	private final CommentService commentService;
 
-	public AuthorControllerImpl(final AuthorService authorService) {
-		this.authorService = authorService;
+	public CommentController(final CommentService commentService) {
+		this.commentService = commentService;
 	}
 
 	@Override
 	@GetMapping(ENTITY_BASE_URI)
-	public ResponseEntity<List<AuthorResponseDto>> readAll(
+	public ResponseEntity<List<CommentResponseDto>> readAll(
 		@RequestParam(defaultValue = "10", required = false) @Min(1) final int limit,
 		@RequestParam(defaultValue = "0", required = false) @Min(0) final int offset,
-		@RequestParam(name = "order_by", defaultValue = "id::asc", required = false) final String orderBy
+		@RequestParam(defaultValue = "id::asc", required = false) final String orderBy
 	) {
-		return ResponseEntity.ok(authorService.readAll(limit, offset, orderBy));
+		return ResponseEntity.ok(commentService.readAll(limit, offset, orderBy));
 	}
 
 	@Override
 	@GetMapping(ENTITY_BASE_URI + "/{id:\\d+}")
-	public ResponseEntity<AuthorResponseDto> readById(
+	public ResponseEntity<CommentResponseDto> readById(
 		@PathVariable @NotNull @Min(ID_MIN_VALUE) final Long id
 	) {
-		return ResponseEntity.ok(authorService.readById(id));
+		return ResponseEntity.ok(commentService.readById(id));
 	}
 
-	@Override
-	@GetMapping("/news/{newsId:\\d+}/author")
-	public ResponseEntity<AuthorResponseDto> readByNewsId(
+	@GetMapping("/news/{newsId:\\d+}/comments")
+	public ResponseEntity<List<CommentResponseDto>> readCommentsByNewsId(
 		@PathVariable("newsId") @NotNull @Min(ID_MIN_VALUE) final Long newsId
 	) {
-		return ResponseEntity.ok(authorService.readAuthorByNewsId(newsId));
+		return ResponseEntity.ok(commentService.readCommentsByNewsId(newsId));
 	}
 
 	@Override
 	@PostMapping(ENTITY_BASE_URI)
-	public ResponseEntity<AuthorResponseDto> create(@RequestBody @Valid final AuthorRequestDto request) {
-		return new ResponseEntity<>(authorService.create(request), HttpStatus.CREATED);
+	@ResponseStatus(HttpStatus.CREATED)
+	public ResponseEntity<CommentResponseDto> create(
+		@RequestBody @Valid final CommentRequestDto request
+	) {
+		return new ResponseEntity<>(commentService.create(request), HttpStatus.CREATED);
 	}
 
 	@Override
 	@PatchMapping(ENTITY_BASE_URI + "/{id:\\d+}")
-	public ResponseEntity<AuthorResponseDto> update(
+	public ResponseEntity<CommentResponseDto> update(
 		@PathVariable Long id,
-		@RequestBody @Valid final AuthorRequestDto request
+		@RequestBody @Valid final CommentRequestDto request
 	) {
 		if (!id.equals(request.id())) {
 			throw new IllegalArgumentException("Path id and request id do not match");
 		}
-		return ResponseEntity.ok(authorService.update(request));
+		return ResponseEntity.ok(commentService.update(request));
 	}
 
 	@Override
 	@DeleteMapping(ENTITY_BASE_URI + "/{id:\\d+}")
 	public ResponseEntity<Object> deleteById(@PathVariable @NotNull @Min(ID_MIN_VALUE) final Long id) {
-		authorService.deleteById(id);
+		commentService.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

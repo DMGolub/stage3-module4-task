@@ -1,6 +1,6 @@
 package com.mjc.school.controller.impl;
 
-import com.mjc.school.controller.interfaces.NewsController;
+import com.mjc.school.controller.BaseController;
 import com.mjc.school.service.NewsService;
 import com.mjc.school.service.dto.NewsRequestDto;
 import com.mjc.school.service.dto.NewsResponseDto;
@@ -18,24 +18,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 import static com.mjc.school.controller.constants.Constants.API_V1_VERSION;
-import static com.mjc.school.controller.impl.NewsControllerImpl.BASE_URI;
+import static com.mjc.school.controller.impl.NewsController.BASE_URI;
 import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 
 @RestController
 @RequestMapping(value = BASE_URI, produces = {"application/JSON"})
-public class NewsControllerImpl implements NewsController {
+public class NewsController implements BaseController<NewsResponseDto, NewsRequestDto, Long> {
 
 	public static final String BASE_URI = "/api/" + API_V1_VERSION;
 	public static final String ENTITY_BASE_URI = "/news";
 
 	private final NewsService newsService;
 
-	public NewsControllerImpl(final NewsService newsService) {
+	public NewsController(final NewsService newsService) {
 		this.newsService = newsService;
 	}
 
@@ -56,8 +57,7 @@ public class NewsControllerImpl implements NewsController {
 	) {
 		return ResponseEntity.ok(newsService.readById(id));
 	}
-
-	@Override
+	
 	@GetMapping(ENTITY_BASE_URI + "/search")
 	public ResponseEntity<List<NewsResponseDto>> readNewsByParams(
 		@RequestParam(value = "tag_names", required = false) final List<String> tagNames,
@@ -73,6 +73,7 @@ public class NewsControllerImpl implements NewsController {
 
 	@Override
 	@PostMapping(ENTITY_BASE_URI)
+	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<NewsResponseDto> create(@RequestBody @Valid final NewsRequestDto request) {
 		return new ResponseEntity<>(newsService.create(request), HttpStatus.CREATED);
 	}

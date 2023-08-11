@@ -1,4 +1,4 @@
-package com.mjc.school.controller.interfaces;
+package com.mjc.school.controller;
 
 import com.mjc.school.service.validator.annotation.Min;
 import com.mjc.school.service.validator.annotation.NotNull;
@@ -8,6 +8,7 @@ import java.util.List;
 
 import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 
+@SuppressWarnings("unused")
 public interface BaseController <R, T, K> {
 
 	ResponseEntity<List<R>> readAll(int limit, int offset, String orderBy);

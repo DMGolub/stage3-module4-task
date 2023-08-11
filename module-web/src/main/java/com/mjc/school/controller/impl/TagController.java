@@ -1,6 +1,6 @@
 package com.mjc.school.controller.impl;
 
-import com.mjc.school.controller.interfaces.TagController;
+import com.mjc.school.controller.BaseController;
 import com.mjc.school.service.TagService;
 import com.mjc.school.service.dto.TagRequestDto;
 import com.mjc.school.service.dto.TagResponseDto;
@@ -17,24 +17,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 import static com.mjc.school.controller.constants.Constants.API_V1_VERSION;
-import static com.mjc.school.controller.impl.TagControllerImpl.BASE_URI;
+import static com.mjc.school.controller.impl.TagController.BASE_URI;
 import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 
 @RestController
 @RequestMapping(value = BASE_URI, produces = {"application/JSON"})
-public class TagControllerImpl implements TagController {
+public class TagController implements BaseController<TagResponseDto, TagRequestDto, Long> {
 
 	public static final String BASE_URI = "/api/" + API_V1_VERSION;
 	public static final String ENTITY_BASE_URI = "/tags";
 
 	private final TagService tagService;
 
-	public TagControllerImpl(final TagService tagService) {
+	public TagController(final TagService tagService) {
 		this.tagService = tagService;
 	}
 
@@ -56,7 +57,6 @@ public class TagControllerImpl implements TagController {
 		return ResponseEntity.ok(tagService.readById(id));
 	}
 
-	@Override
 	@GetMapping("/news/{newsId:\\d+}/tags")
 	public ResponseEntity<List<TagResponseDto>> readTagsByNewsId(
 		@PathVariable("newsId") @NotNull @Min(ID_MIN_VALUE) final Long newsId
@@ -66,6 +66,7 @@ public class TagControllerImpl implements TagController {
 
 	@Override
 	@PostMapping(ENTITY_BASE_URI)
+	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<TagResponseDto> create(@RequestBody @Valid final TagRequestDto request) {
 		return new ResponseEntity<>(tagService.create(request), HttpStatus.CREATED);
 	}
