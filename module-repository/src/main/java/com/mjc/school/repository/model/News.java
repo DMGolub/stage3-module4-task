@@ -19,6 +19,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,9 +49,9 @@ public class News implements BaseEntity<Long> {
 	@JoinTable(name = "News_tags",
 		joinColumns = @JoinColumn(name = "news_id"),
 		inverseJoinColumns = @JoinColumn(name = "tag_id"))
-	private List<Tag> tags;
+	private List<Tag> tags = new ArrayList<>();
 	@OneToMany(mappedBy = "news", cascade = CascadeType.REMOVE)
-	private List<Comment> comments;
+	private List<Comment> comments = new ArrayList<>();
 
 	public News() {
 		// Empty. Used by JPA

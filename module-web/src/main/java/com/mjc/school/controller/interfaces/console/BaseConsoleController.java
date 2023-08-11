@@ -1,8 +1,8 @@
-package com.mjc.school.controller;
+package com.mjc.school.controller.interfaces.console;
 
 import java.util.List;
 
-public interface BaseController<T, R, K> {
+public interface BaseConsoleController<T, R, K> {
 
     List<R> readAll();
 

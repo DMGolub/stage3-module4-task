@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mjc.school.service.constants.Constants.ID_VALUE_MIN;
+import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 import static com.mjc.school.service.constants.Constants.NEWS_ENTITY_NAME;
 import static com.mjc.school.service.constants.Constants.TAG_ENTITY_NAME;
 import static com.mjc.school.service.exception.ServiceErrorCode.ENTITY_NOT_FOUND_BY_ID;
@@ -49,7 +49,13 @@ public class TagServiceImpl implements TagService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public TagResponseDto readById(@NotNull @Min(ID_VALUE_MIN) final Long id)
+	public List<TagResponseDto> readAll(final int limit, final int offset, final String orderBy) {
+		return tagMapper.modelListToDtoList(tagRepository.readAll(limit, offset, orderBy));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public TagResponseDto readById(@NotNull @Min(ID_MIN_VALUE) final Long id)
 			throws EntityNotFoundException {
 		final Optional<Tag> tag = tagRepository.readById(id);
 		if (tag.isPresent()) {
@@ -64,7 +70,7 @@ public class TagServiceImpl implements TagService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TagResponseDto> readTagsByNewsId(@NotNull @Min(ID_VALUE_MIN) final Long newsId) {
+	public List<TagResponseDto> readTagsByNewsId(@NotNull @Min(ID_MIN_VALUE) final Long newsId) {
 		if (newsRepository.existById(newsId)) {
 			return tagMapper.modelListToDtoList(tagRepository.readTagsByNewsId(newsId));
 		}
@@ -98,7 +104,7 @@ public class TagServiceImpl implements TagService {
 
 	@Override
 	@Transactional
-	public boolean deleteById(@NotNull @Min(ID_VALUE_MIN) final Long id) throws EntityNotFoundException {
+	public boolean deleteById(@NotNull @Min(ID_MIN_VALUE) final Long id) throws EntityNotFoundException {
 		if (tagRepository.existById(id)) {
 			NewsSearchQueryParams params =
 				new NewsSearchQueryParams(null, List.of(id), null, null, null);

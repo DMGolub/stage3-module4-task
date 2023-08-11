@@ -2,7 +2,7 @@ package com.mjc.school.service.constants;
 
 public final class Constants {
 
-	public static final long ID_VALUE_MIN = 1L;
+	public static final long ID_MIN_VALUE = 1L;
 	public static final long ID_VALUE_MAX = Long.MAX_VALUE;
 	public static final int AUTHOR_NAME_LENGTH_MIN = 3;
 	public static final int AUTHOR_NAME_LENGTH_MAX = 15;

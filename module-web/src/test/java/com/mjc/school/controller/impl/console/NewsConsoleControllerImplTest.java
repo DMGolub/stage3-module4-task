@@ -1,4 +1,4 @@
-package com.mjc.school.controller.impl;
+package com.mjc.school.controller.impl.console;
 
 import com.mjc.school.service.dto.NewsRequestDto;
 import com.mjc.school.service.impl.NewsServiceImpl;
@@ -12,12 +12,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class NewsControllerImplTest {
+class NewsConsoleControllerImplTest {
 
 	@Mock
 	private NewsServiceImpl newsService;
 	@InjectMocks
-	private NewsControllerImpl newsController;
+	private NewsConsoleControllerImpl newsController;
 
 	@Test
 	void create_shouldInvokeServiceSaveMethod_whenInvoked() {

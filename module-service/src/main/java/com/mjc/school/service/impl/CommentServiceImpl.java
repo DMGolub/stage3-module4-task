@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mjc.school.service.constants.Constants.COMMENT_ENTITY_NAME;
-import static com.mjc.school.service.constants.Constants.ID_VALUE_MIN;
+import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 import static com.mjc.school.service.constants.Constants.NEWS_ENTITY_NAME;
 import static com.mjc.school.service.exception.ServiceErrorCode.ENTITY_NOT_FOUND_BY_ID;
 
@@ -48,7 +48,13 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public CommentResponseDto readById(@NotNull @Min(ID_VALUE_MIN) final Long id)
+	public List<CommentResponseDto> readAll(final int limit, final int offset, final String orderBy) {
+		return commentMapper.modelListToDtoList(commentRepository.readAll(limit, offset, orderBy));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public CommentResponseDto readById(@NotNull @Min(ID_MIN_VALUE) final Long id)
 			throws EntityNotFoundException {
 		final Optional<Comment> comment = commentRepository.readById(id);
 		if (comment.isPresent()) {
@@ -63,7 +69,7 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<CommentResponseDto> readCommentsByNewsId(@NotNull @Min(ID_VALUE_MIN) final Long newsId)
+	public List<CommentResponseDto> readCommentsByNewsId(@NotNull @Min(ID_MIN_VALUE) final Long newsId)
 			throws EntityNotFoundException {
 		if (newsRepository.existById(newsId)) {
 			return commentMapper.modelListToDtoList(commentRepository.readCommentsByNewsId(newsId));
@@ -104,7 +110,7 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional
-	public boolean deleteById(@NotNull @Min(ID_VALUE_MIN) final Long id) {
+	public boolean deleteById(@NotNull @Min(ID_MIN_VALUE) final Long id) {
 		final Optional<Comment> comment = commentRepository.readById(id);
 		if (comment.isPresent()) {
 			final News news = comment.get().getNews();

@@ -1,4 +1,4 @@
-package com.mjc.school.controller.impl;
+package com.mjc.school.controller.impl.console;
 
 import com.mjc.school.service.dto.AuthorRequestDto;
 import com.mjc.school.service.impl.AuthorServiceImpl;
@@ -12,12 +12,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class AuthorControllerImplTest {
+class AuthorConsoleControllerImplTest {
 
 	@Mock
 	private AuthorServiceImpl authorService;
 	@InjectMocks
-	private AuthorControllerImpl authorController;
+	private AuthorConsoleControllerImpl authorController;
 
 	@Test
 	void create_shouldInvokeServiceSaveMethod_whenInvoked() {

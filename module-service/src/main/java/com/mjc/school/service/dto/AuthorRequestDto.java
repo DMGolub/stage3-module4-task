@@ -8,10 +8,10 @@ import com.mjc.school.service.validator.annotation.Size;
 import static com.mjc.school.service.constants.Constants.AUTHOR_NAME_LENGTH_MAX;
 import static com.mjc.school.service.constants.Constants.AUTHOR_NAME_LENGTH_MIN;
 import static com.mjc.school.service.constants.Constants.ID_VALUE_MAX;
-import static com.mjc.school.service.constants.Constants.ID_VALUE_MIN;
+import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 
 public record AuthorRequestDto(
-	@Min(ID_VALUE_MIN)
+	@Min(ID_MIN_VALUE)
 	@Max(ID_VALUE_MAX)
 	Long id,
 

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mjc.school.service.constants.Constants.AUTHOR_ENTITY_NAME;
-import static com.mjc.school.service.constants.Constants.ID_VALUE_MIN;
+import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 import static com.mjc.school.service.constants.Constants.NEWS_ENTITY_NAME;
 import static com.mjc.school.service.constants.Constants.TAG_ENTITY_NAME;
 import static com.mjc.school.service.exception.ServiceErrorCode.ENTITY_NOT_FOUND_BY_ID;
@@ -63,7 +63,7 @@ public class NewsServiceImpl implements NewsService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public NewsResponseDto readById(@NotNull @Min(ID_VALUE_MIN) final Long id) throws EntityNotFoundException {
+	public NewsResponseDto readById(@NotNull @Min(ID_MIN_VALUE) final Long id) throws EntityNotFoundException {
 		final Optional<News> news = newsRepository.readById(id);
 		if (news.isPresent()) {
 			return mapper.modelToDto(news.get());
@@ -89,6 +89,12 @@ public class NewsServiceImpl implements NewsService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public List<NewsResponseDto> readAll(final int limit, final int offset, final String orderBy) {
+		return mapper.modelListToDtoList(newsRepository.readAll(limit, offset, orderBy));
+	}
+
+	@Override
 	@Transactional
 	public NewsResponseDto update(@NotNull @Valid final NewsRequestDto request) throws EntityNotFoundException {
 		final Long id = request.id();
@@ -111,7 +117,7 @@ public class NewsServiceImpl implements NewsService {
 
 	@Override
 	@Transactional
-	public boolean deleteById(@NotNull @Min(ID_VALUE_MIN) final Long id) throws EntityNotFoundException {
+	public boolean deleteById(@NotNull @Min(ID_MIN_VALUE) final Long id) throws EntityNotFoundException {
 		if (newsRepository.existById(id)) {
 			return newsRepository.deleteById(id);
 		}

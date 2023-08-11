@@ -6,9 +6,9 @@ import com.mjc.school.controller.annotation.CommandBody;
 import com.mjc.school.controller.annotation.CommandHandler;
 import com.mjc.school.controller.annotation.CommandParam;
 import com.mjc.school.controller.annotation.CommandQueryParams;
+import com.mjc.school.controller.annotation.ConsoleController;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +30,7 @@ public class CommandSender {
 	private final Map<Class<?>, Function<String, Object>> stringToObjectMappers;
 
 	public CommandSender(final ListableBeanFactory listableBeanFactory) {
-		controllers = listableBeanFactory.getBeansWithAnnotation(Controller.class);
+		controllers = listableBeanFactory.getBeansWithAnnotation(ConsoleController.class);
 		Objects.requireNonNull(controllers);
 
 		mapper = new ObjectMapper();

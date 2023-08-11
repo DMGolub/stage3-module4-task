@@ -9,6 +9,9 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Optional;
@@ -29,9 +32,30 @@ public abstract class AbstractRepository<T extends BaseEntity<K>, K> implements 
 
 	@Override
 	public List<T> readAll() {
-		TypedQuery<T> query = entityManager.createQuery("SELECT e FROM "
+		final TypedQuery<T> query = entityManager.createQuery("SELECT e FROM "
 			+ entityClass.getSimpleName() + " e", entityClass);
 		return query.getResultList();
+	}
+
+	@Override
+	public List<T> readAll(final int limit, final int offset, final String orderBy) {
+		final String[] ordering = orderBy.split("::");
+		final String field = ordering[0];
+		final String direction = ordering[1];
+		final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+		final CriteriaQuery<T> query = criteriaBuilder.createQuery(entityClass);
+		final Root<T> entity = query.from(entityClass);
+
+		CriteriaQuery<T> select;
+		if ("desc".equalsIgnoreCase(direction)) {
+			select = query.select(entity).orderBy(criteriaBuilder.desc(entity.get(field)));
+		} else {
+			select = query.select(entity).orderBy(criteriaBuilder.asc(entity.get(field)));
+		}
+		return entityManager.createQuery(select)
+			.setFirstResult(offset)
+			.setMaxResults(limit)
+			.getResultList();
 	}
 
 	@Override

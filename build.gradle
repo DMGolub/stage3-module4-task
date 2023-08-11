@@ -28,6 +28,7 @@ subprojects {
 		testImplementation "org.assertj:assertj-core:$assertJVersion"
 
 		implementation "org.springframework.boot:spring-boot-starter-data-jpa:$springDataJpaVersion"
+		implementation "org.springframework.boot:spring-boot-starter-web:$springWebVersion"
 		implementation "javax.xml.bind:jaxb-api:$jaxbApiVersion"
 	}
 

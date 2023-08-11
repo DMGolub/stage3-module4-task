@@ -9,6 +9,8 @@ public interface BaseRepository<T extends BaseEntity<K>, K> {
 
     List<T> readAll();
 
+    List<T> readAll(int limit, int offset, String orderBy);
+
     Optional<T> readById(K id);
 
     T create(T entity);

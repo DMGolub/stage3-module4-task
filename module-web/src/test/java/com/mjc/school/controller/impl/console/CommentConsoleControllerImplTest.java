@@ -1,4 +1,4 @@
-package com.mjc.school.controller.impl;
+package com.mjc.school.controller.impl.console;
 
 import com.mjc.school.service.dto.CommentRequestDto;
 import com.mjc.school.service.impl.CommentServiceImpl;
@@ -12,12 +12,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class CommentControllerImplTest {
+class CommentConsoleControllerImplTest {
 
 	@Mock
 	private CommentServiceImpl commentService;
 	@InjectMocks
-	private CommentControllerImpl commentController;
+	private CommentConsoleControllerImpl commentController;
 
 	@Test
 	void create_shouldInvokeServiceSaveMethod_whenInvoked() {

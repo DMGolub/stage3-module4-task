@@ -1,4 +1,4 @@
-package com.mjc.school.controller.impl;
+package com.mjc.school.controller.impl.console;
 
 import com.mjc.school.service.dto.TagRequestDto;
 import com.mjc.school.service.impl.TagServiceImpl;
@@ -12,12 +12,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class TagControllerImplTest {
+class TagConsoleControllerImplTest {
 
 	@Mock
 	private TagServiceImpl tagService;
 	@InjectMocks
-	private TagControllerImpl tagController;
+	private TagConsoleControllerImpl tagController;
 
 	@Test
 	void create_shouldInvokeServiceSaveMethod_whenInvoked() {

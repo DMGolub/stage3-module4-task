@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mjc.school.service.constants.Constants.AUTHOR_ENTITY_NAME;
-import static com.mjc.school.service.constants.Constants.ID_VALUE_MIN;
+import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 import static com.mjc.school.service.constants.Constants.NEWS_ENTITY_NAME;
 import static com.mjc.school.service.exception.ServiceErrorCode.ENTITY_NOT_FOUND_BY_ID;
 
@@ -47,7 +47,7 @@ public class AuthorServiceImpl implements AuthorService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public AuthorResponseDto readById(@NotNull @Min(ID_VALUE_MIN) final Long id)
+	public AuthorResponseDto readById(@NotNull @Min(ID_MIN_VALUE) final Long id)
 			throws EntityNotFoundException {
 		final Optional<Author> author = authorRepository.readById(id);
 		if (author.isPresent()) {
@@ -62,7 +62,7 @@ public class AuthorServiceImpl implements AuthorService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public AuthorResponseDto readAuthorByNewsId(@NotNull @Min(ID_VALUE_MIN) final Long newsId) {
+	public AuthorResponseDto readAuthorByNewsId(@NotNull @Min(ID_MIN_VALUE) final Long newsId) {
 		if (newsRepository.existById(newsId)) {
 			final Optional<Author> author = authorRepository.readAuthorByNewsId(newsId);
 			if (author.isPresent()) {
@@ -87,6 +87,12 @@ public class AuthorServiceImpl implements AuthorService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public List<AuthorResponseDto> readAll(final int limit, final int offset, final String orderBy) {
+		return mapper.modelListToDtoList(authorRepository.readAll(limit, offset, orderBy));
+	}
+
+	@Override
 	@Transactional
 	public AuthorResponseDto update(@NotNull @Valid final AuthorRequestDto request)
 			throws EntityNotFoundException {
@@ -107,7 +113,7 @@ public class AuthorServiceImpl implements AuthorService {
 
 	@Override
 	@Transactional
-	public boolean deleteById(@NotNull @Min(ID_VALUE_MIN) final Long id) throws EntityNotFoundException {
+	public boolean deleteById(@NotNull @Min(ID_MIN_VALUE) final Long id) throws EntityNotFoundException {
 		if (authorRepository.existById(id)) {
 			return authorRepository.deleteById(id);
 		}
