@@ -19,5 +19,5 @@ public interface BaseController <R, T, K> {
 
 	ResponseEntity<R> update(K id, T updateRequest);
 
-	ResponseEntity<Object> deleteById(@NotNull @Min(ID_MIN_VALUE) K id);
+	void deleteById(@NotNull @Min(ID_MIN_VALUE) K id);
 }

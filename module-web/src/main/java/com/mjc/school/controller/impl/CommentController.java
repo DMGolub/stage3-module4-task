@@ -87,8 +87,8 @@ public class CommentController implements BaseController<CommentResponseDto, Com
 
 	@Override
 	@DeleteMapping(ENTITY_BASE_URI + "/{id:\\d+}")
-	public ResponseEntity<Object> deleteById(@PathVariable @NotNull @Min(ID_MIN_VALUE) final Long id) {
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteById(@PathVariable @NotNull @Min(ID_MIN_VALUE) final Long id) {
 		commentService.deleteById(id);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
