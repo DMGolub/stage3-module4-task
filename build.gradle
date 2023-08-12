@@ -21,15 +21,15 @@ subprojects {
 	dependencies {
 		implementation "org.springframework:spring-context:$springVersion"
 
-		testImplementation "org.springframework:spring-test:$springVersion"
-		testImplementation "org.junit.jupiter:junit-jupiter-api:$jupiterVersion"
-		testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jupiterVersion"
 		testImplementation "com.tngtech.archunit:archunit-junit5:$archUnitVersion"
 		testImplementation "org.assertj:assertj-core:$assertJVersion"
 
 		implementation "org.springframework.boot:spring-boot-starter-data-jpa:$springDataJpaVersion"
 		implementation "org.springframework.boot:spring-boot-starter-web:$springWebVersion"
 		implementation "javax.xml.bind:jaxb-api:$jaxbApiVersion"
+
+		testImplementation "org.springframework.boot:spring-boot-starter-test:$springTestVersion"
+
 	}
 
 	test {
