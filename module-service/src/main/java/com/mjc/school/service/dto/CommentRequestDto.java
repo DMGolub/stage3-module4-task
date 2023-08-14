@@ -19,6 +19,8 @@ public record CommentRequestDto(
 	@Size(min = COMMENT_CONTENT_LENGTH_MIN, max = COMMENT_CONTENT_LENGTH_MAX)
 	String content,
 	@NotNull
+	@Min(ID_MIN_VALUE)
+	@Max(ID_VALUE_MAX)
 	Long newsId
 ) {
 	// Empty

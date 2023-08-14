@@ -1,9 +1,11 @@
 package com.mjc.school.service.impl;
 
 import com.mjc.school.repository.AuthorRepository;
+import com.mjc.school.repository.exception.EntityConstraintViolationRepositoryException;
 import com.mjc.school.repository.model.Author;
 import com.mjc.school.service.dto.AuthorRequestDto;
 import com.mjc.school.service.dto.AuthorResponseDto;
+import com.mjc.school.service.exception.EntityConstraintViolationServiceException;
 import com.mjc.school.service.exception.EntityNotFoundException;
 import com.mjc.school.service.mapper.AuthorMapper;
 import com.mjc.school.service.util.Util;
@@ -42,6 +44,17 @@ class AuthorServiceImplTest {
 
 	@Nested
 	class TestCreate {
+
+		@Test
+		void create_shouldThrowEntityConstraintViolationServiceException_whenNameAlreadyExists() {
+			final String authorName = "Conflicting name";
+			final AuthorRequestDto request = new AuthorRequestDto(null, authorName);
+			when(authorRepository.create(any())).thenThrow(
+				new EntityConstraintViolationRepositoryException("Constraint violation"));
+
+			assertThrows(EntityConstraintViolationServiceException.class,
+				() -> authorService.create(request));
+		}
 
 		@Test
 		void create_shouldReturnSavedEntity_whenValidRequestDtoProvided() {
@@ -141,6 +154,20 @@ class AuthorServiceImplTest {
 			assertThrows(EntityNotFoundException.class, () -> authorService.update(request));
 			verify(authorRepository, times(1)).readById(request.id());
 			verify(authorRepository, times(0)).update(any());
+		}
+
+		@Test
+		void update_shouldThrowEntityConstraintViolationServiceException_whenNameAlreadyExists() {
+			final long id = 2L;
+			final AuthorRequestDto request = new AuthorRequestDto(id, "Conflicting name");
+			LocalDateTime date = LocalDateTime.now();
+			final Author updated = new Author(id, "Old name", date, date);
+			when(authorRepository.readById(request.id())).thenReturn(Optional.of(updated));
+			when(authorRepository.update(any())).thenThrow(
+				new EntityConstraintViolationRepositoryException("Constraint violation"));
+
+			assertThrows(EntityConstraintViolationServiceException.class,
+				() -> authorService.update(request));
 		}
 
 		@Test

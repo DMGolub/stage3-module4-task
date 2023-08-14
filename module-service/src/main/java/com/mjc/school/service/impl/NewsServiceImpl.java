@@ -3,12 +3,14 @@ package com.mjc.school.service.impl;
 import com.mjc.school.repository.AuthorRepository;
 import com.mjc.school.repository.NewsRepository;
 import com.mjc.school.repository.TagRepository;
+import com.mjc.school.repository.exception.EntityConstraintViolationRepositoryException;
 import com.mjc.school.repository.model.Author;
 import com.mjc.school.repository.model.News;
 import com.mjc.school.repository.model.Tag;
 import com.mjc.school.service.NewsService;
 import com.mjc.school.service.dto.NewsRequestDto;
 import com.mjc.school.service.dto.NewsResponseDto;
+import com.mjc.school.service.exception.EntityConstraintViolationServiceException;
 import com.mjc.school.service.exception.EntityNotFoundException;
 import com.mjc.school.service.mapper.NewsMapper;
 import com.mjc.school.service.query.NewsQueryParams;
@@ -27,6 +29,7 @@ import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 import static com.mjc.school.service.constants.Constants.NEWS_ENTITY_NAME;
 import static com.mjc.school.service.constants.Constants.TAG_ENTITY_NAME;
 import static com.mjc.school.service.exception.ServiceErrorCode.ENTITY_NOT_FOUND_BY_ID;
+import static com.mjc.school.service.exception.ServiceErrorCode.NEWS_CONSTRAINT_VIOLATION;
 
 @Service
 public class NewsServiceImpl implements NewsService {
@@ -58,7 +61,16 @@ public class NewsServiceImpl implements NewsService {
 			news.setTags(getTags(tagIds));
 		}
 		news.setComments(new ArrayList<>());
-		return mapper.modelToDto(newsRepository.create(news));
+		final News result;
+		try {
+			result = newsRepository.create(news);
+		} catch (final EntityConstraintViolationRepositoryException e) {
+			throw new EntityConstraintViolationServiceException(
+				NEWS_CONSTRAINT_VIOLATION.getMessage(),
+				NEWS_CONSTRAINT_VIOLATION.getCode()
+			);
+		}
+		return mapper.modelToDto(result);
 	}
 
 	@Override
@@ -106,7 +118,16 @@ public class NewsServiceImpl implements NewsService {
 				updated.setContent(request.content());
 				updated.setAuthor(getAuthor(request.authorId()));
 				updated.setTags(getTags(request.tags()));
-				return mapper.modelToDto(newsRepository.update(updated));
+				final News result;
+				try {
+					result = newsRepository.update(updated);
+				} catch (final EntityConstraintViolationRepositoryException e) {
+					throw new EntityConstraintViolationServiceException(
+						NEWS_CONSTRAINT_VIOLATION.getMessage(),
+						NEWS_CONSTRAINT_VIOLATION.getCode()
+					);
+				}
+				return mapper.modelToDto(result);
 			}
 		}
 		throw new EntityNotFoundException(

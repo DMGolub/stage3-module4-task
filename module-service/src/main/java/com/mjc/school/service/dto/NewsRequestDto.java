@@ -19,14 +19,15 @@ public record NewsRequestDto(
 	@Min(ID_MIN_VALUE)
 	@Max(ID_VALUE_MAX)
 	Long id,
-
 	@NotNull
 	@Size(min = NEWS_TITLE_LENGTH_MIN, max = NEWS_TITLE_LENGTH_MAX)
 	String title,
-
 	@NotNull
 	@Size(min = NEWS_CONTENT_LENGTH_MIN, max = NEWS_CONTENT_LENGTH_MAX)
 	String content,
+	@NotNull
+	@Min(ID_MIN_VALUE)
+	@Max(ID_VALUE_MAX)
 	Long authorId,
 	List<Long> tags
 ) {

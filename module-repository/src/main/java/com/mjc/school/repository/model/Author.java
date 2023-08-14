@@ -27,7 +27,7 @@ public class Author implements BaseEntity<Long> {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "author_id")
 	private Long id;
-	@Column(name = "author_name", nullable = false)
+	@Column(name = "author_name", nullable = false, unique = true)
 	private String name;
 	@CreatedDate
 	@Column(name = "author_create_date", nullable = false)

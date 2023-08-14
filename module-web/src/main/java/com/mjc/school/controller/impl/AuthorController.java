@@ -1,6 +1,7 @@
 package com.mjc.school.controller.impl;
 
 import com.mjc.school.controller.BaseController;
+import com.mjc.school.controller.versioning.ApiVersion;
 import com.mjc.school.service.AuthorService;
 import com.mjc.school.service.dto.AuthorRequestDto;
 import com.mjc.school.service.dto.AuthorResponseDto;
@@ -8,6 +9,7 @@ import com.mjc.school.service.validator.annotation.Min;
 import com.mjc.school.service.validator.annotation.NotNull;
 import com.mjc.school.service.validator.annotation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,16 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.mjc.school.controller.constants.Constants.API_V1_VERSION;
-import static com.mjc.school.controller.impl.AuthorController.BASE_URI;
+import static com.mjc.school.controller.constants.Constants.API_ROOT_PATH;
+import static com.mjc.school.controller.constants.Constants.AUTHOR_ROOT_PATH;
+import static com.mjc.school.controller.constants.Constants.NEWS_ROOT_PATH;
 import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 
 @RestController
-@RequestMapping(value = BASE_URI, produces = {"application/JSON"})
+@ApiVersion(1)
+@RequestMapping(path = API_ROOT_PATH, produces = {"application/JSON"})
 public class AuthorController implements BaseController<AuthorResponseDto, AuthorRequestDto, Long> {
-
-	public static final String BASE_URI = "/api/" + API_V1_VERSION;
-	public static final String ENTITY_BASE_URI = "/authors";
 
 	private final AuthorService authorService;
 
@@ -40,7 +41,7 @@ public class AuthorController implements BaseController<AuthorResponseDto, Autho
 	}
 
 	@Override
-	@GetMapping(ENTITY_BASE_URI)
+	@GetMapping(AUTHOR_ROOT_PATH)
 	public ResponseEntity<List<AuthorResponseDto>> readAll(
 		@RequestParam(defaultValue = "10", required = false) @Min(1) final int limit,
 		@RequestParam(defaultValue = "0", required = false) @Min(0) final int offset,
@@ -50,14 +51,14 @@ public class AuthorController implements BaseController<AuthorResponseDto, Autho
 	}
 
 	@Override
-	@GetMapping(ENTITY_BASE_URI + "/{id:\\d+}")
+	@GetMapping(AUTHOR_ROOT_PATH + "/{id:\\d+}")
 	public ResponseEntity<AuthorResponseDto> readById(
 		@PathVariable @NotNull @Min(ID_MIN_VALUE) final Long id
 	) {
 		return ResponseEntity.ok(authorService.readById(id));
 	}
 
-	@GetMapping("/news/{newsId:\\d+}/author")
+	@GetMapping(NEWS_ROOT_PATH + "/{newsId:\\d+}/author")
 	public ResponseEntity<AuthorResponseDto> readByNewsId(
 		@PathVariable("newsId") @NotNull @Min(ID_MIN_VALUE) final Long newsId
 	) {
@@ -65,14 +66,14 @@ public class AuthorController implements BaseController<AuthorResponseDto, Autho
 	}
 
 	@Override
-	@PostMapping(ENTITY_BASE_URI)
+	@PostMapping(path = AUTHOR_ROOT_PATH, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<AuthorResponseDto> create(@RequestBody @Valid final AuthorRequestDto request) {
 		return new ResponseEntity<>(authorService.create(request), HttpStatus.CREATED);
 	}
 
 	@Override
-	@PatchMapping(ENTITY_BASE_URI + "/{id:\\d+}")
+	@PatchMapping(path = AUTHOR_ROOT_PATH + "/{id:\\d+}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<AuthorResponseDto> update(
 		@PathVariable Long id,
 		@RequestBody @Valid final AuthorRequestDto request
@@ -84,7 +85,7 @@ public class AuthorController implements BaseController<AuthorResponseDto, Autho
 	}
 
 	@Override
-	@DeleteMapping(ENTITY_BASE_URI + "/{id:\\d+}")
+	@DeleteMapping(AUTHOR_ROOT_PATH + "/{id:\\d+}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteById(@PathVariable @NotNull @Min(ID_MIN_VALUE) final Long id) {
 		authorService.deleteById(id);

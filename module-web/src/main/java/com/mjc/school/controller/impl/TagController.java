@@ -1,6 +1,7 @@
 package com.mjc.school.controller.impl;
 
 import com.mjc.school.controller.BaseController;
+import com.mjc.school.controller.versioning.ApiVersion;
 import com.mjc.school.service.TagService;
 import com.mjc.school.service.dto.TagRequestDto;
 import com.mjc.school.service.dto.TagResponseDto;
@@ -8,6 +9,7 @@ import com.mjc.school.service.validator.annotation.Min;
 import com.mjc.school.service.validator.annotation.NotNull;
 import com.mjc.school.service.validator.annotation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,16 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.mjc.school.controller.constants.Constants.API_V1_VERSION;
-import static com.mjc.school.controller.impl.TagController.BASE_URI;
+import static com.mjc.school.controller.constants.Constants.API_ROOT_PATH;
+import static com.mjc.school.controller.constants.Constants.NEWS_ROOT_PATH;
+import static com.mjc.school.controller.constants.Constants.TAG_ROOT_PATH;
 import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 
 @RestController
-@RequestMapping(value = BASE_URI, produces = {"application/JSON"})
+@ApiVersion(1)
+@RequestMapping(path = API_ROOT_PATH, produces = {"application/JSON"})
 public class TagController implements BaseController<TagResponseDto, TagRequestDto, Long> {
-
-	public static final String BASE_URI = "/api/" + API_V1_VERSION;
-	public static final String ENTITY_BASE_URI = "/tags";
 
 	private final TagService tagService;
 
@@ -40,7 +41,7 @@ public class TagController implements BaseController<TagResponseDto, TagRequestD
 	}
 
 	@Override
-	@GetMapping(ENTITY_BASE_URI)
+	@GetMapping(TAG_ROOT_PATH)
 	public ResponseEntity<List<TagResponseDto>> readAll(
 		@RequestParam(defaultValue = "10", required = false) @Min(1) final int limit,
 		@RequestParam(defaultValue = "0", required = false) @Min(0) final int offset,
@@ -50,14 +51,14 @@ public class TagController implements BaseController<TagResponseDto, TagRequestD
 	}
 
 	@Override
-	@GetMapping(ENTITY_BASE_URI + "/{id:\\d+}")
+	@GetMapping(TAG_ROOT_PATH + "/{id:\\d+}")
 	public ResponseEntity<TagResponseDto> readById(
 		@PathVariable @NotNull @Min(ID_MIN_VALUE) final Long id
 	) {
 		return ResponseEntity.ok(tagService.readById(id));
 	}
 
-	@GetMapping("/news/{newsId:\\d+}/tags")
+	@GetMapping(NEWS_ROOT_PATH + "/{newsId:\\d+}/tags")
 	public ResponseEntity<List<TagResponseDto>> readTagsByNewsId(
 		@PathVariable("newsId") @NotNull @Min(ID_MIN_VALUE) final Long newsId
 	) {
@@ -65,14 +66,14 @@ public class TagController implements BaseController<TagResponseDto, TagRequestD
 	}
 
 	@Override
-	@PostMapping(ENTITY_BASE_URI)
+	@PostMapping(path = TAG_ROOT_PATH, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<TagResponseDto> create(@RequestBody @Valid final TagRequestDto request) {
 		return new ResponseEntity<>(tagService.create(request), HttpStatus.CREATED);
 	}
 
 	@Override
-	@PatchMapping(ENTITY_BASE_URI + "/{id:\\d+}")
+	@PatchMapping(path = TAG_ROOT_PATH + "/{id:\\d+}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<TagResponseDto> update(
 		@PathVariable Long id,
 		@RequestBody @Valid final TagRequestDto request
@@ -84,7 +85,7 @@ public class TagController implements BaseController<TagResponseDto, TagRequestD
 	}
 
 	@Override
-	@DeleteMapping(ENTITY_BASE_URI + "/{id:\\d+}")
+	@DeleteMapping(TAG_ROOT_PATH + "/{id:\\d+}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteById(@PathVariable @NotNull @Min(ID_MIN_VALUE) final Long id) {
 		tagService.deleteById(id);

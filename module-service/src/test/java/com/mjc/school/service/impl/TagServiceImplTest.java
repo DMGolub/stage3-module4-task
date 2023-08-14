@@ -2,10 +2,12 @@ package com.mjc.school.service.impl;
 
 import com.mjc.school.repository.NewsRepository;
 import com.mjc.school.repository.TagRepository;
+import com.mjc.school.repository.exception.EntityConstraintViolationRepositoryException;
 import com.mjc.school.repository.model.Tag;
 import com.mjc.school.repository.query.NewsSearchQueryParams;
 import com.mjc.school.service.dto.TagRequestDto;
 import com.mjc.school.service.dto.TagResponseDto;
+import com.mjc.school.service.exception.EntityConstraintViolationServiceException;
 import com.mjc.school.service.exception.EntityNotFoundException;
 import com.mjc.school.service.mapper.TagMapper;
 import com.mjc.school.service.util.Util;
@@ -46,6 +48,18 @@ class TagServiceImplTest {
 
 	@Nested
 	class TestCreate {
+
+		@Test
+		void create_shouldThrowEntityConstraintViolationServiceException_whenNameAlreadyExists() {
+			final String tagName = "Conflicting name";
+			final TagRequestDto request = new TagRequestDto(null, tagName);
+			when(tagRepository.create(any())).thenThrow(
+				new EntityConstraintViolationRepositoryException("Constraint violation"));
+
+			assertThrows(EntityConstraintViolationServiceException.class,
+				() -> tagService.create(request));
+
+		}
 
 		@Test
 		void create_shouldReturnSavedEntity_whenValidRequestDtoProvided() {
@@ -144,6 +158,18 @@ class TagServiceImplTest {
 			assertThrows(EntityNotFoundException.class, () -> tagService.update(request));
 			verify(tagRepository, times(1)).existById(request.id());
 			verify(tagRepository, times(0)).update(any());
+		}
+
+		@Test
+		void update_shouldThrowEntityConstraintViolationServiceException_whenNameAlreadyExists() {
+			final long id = 1L;
+			final TagRequestDto request = new TagRequestDto(id, "Conflicting name");
+			when(tagRepository.existById(request.id())).thenReturn(true);
+			when(tagRepository.update(any())).thenThrow(
+				new EntityConstraintViolationRepositoryException("Constraint violation"));
+
+			assertThrows(EntityConstraintViolationServiceException.class,
+				() -> tagService.update(request));
 		}
 
 		@Test

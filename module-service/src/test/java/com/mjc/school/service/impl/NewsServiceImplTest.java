@@ -3,6 +3,7 @@ package com.mjc.school.service.impl;
 import com.mjc.school.repository.AuthorRepository;
 import com.mjc.school.repository.NewsRepository;
 import com.mjc.school.repository.TagRepository;
+import com.mjc.school.repository.exception.EntityConstraintViolationRepositoryException;
 import com.mjc.school.repository.impl.AuthorRepositoryImpl;
 import com.mjc.school.repository.impl.NewsRepositoryImpl;
 import com.mjc.school.repository.impl.TagRepositoryImpl;
@@ -10,6 +11,7 @@ import com.mjc.school.repository.model.News;
 import com.mjc.school.service.NewsService;
 import com.mjc.school.service.dto.NewsRequestDto;
 import com.mjc.school.service.dto.NewsResponseDto;
+import com.mjc.school.service.exception.EntityConstraintViolationServiceException;
 import com.mjc.school.service.exception.EntityNotFoundException;
 import com.mjc.school.service.mapper.NewsMapper;
 import com.mjc.school.service.util.Util;
@@ -86,6 +88,27 @@ class NewsServiceImplTest {
 			assertThrows(EntityNotFoundException.class, () -> newsService.create(request));
 			verify(authorRepository, times(1)).readById(authorId);
 			verifyNoInteractions(newsRepository);
+		}
+
+		@Test
+		void create_shouldThrowEntityConstraintViolationServiceException_whenTitleAlreadyExists() {
+			final long authorId = 1L;
+			final NewsRequestDto request = new NewsRequestDto(
+				null,
+				"Conflicting title",
+				"Some valid content",
+				authorId,
+				new ArrayList<>()
+			);
+			final News newsRequest = Util.dtoToNews(request);
+			when(authorRepository.readById(authorId))
+				.thenReturn(Optional.of(Util.createTestAuthor(authorId)));
+			when(newsMapper.dtoToModel(request)).thenReturn(newsRequest);
+			when(newsRepository.create(any())).thenThrow(
+				new EntityConstraintViolationRepositoryException("Constraint violation"));
+
+			assertThrows(EntityConstraintViolationServiceException.class,
+				() -> newsService.create(request));
 		}
 
 		@Test
@@ -241,6 +264,31 @@ class NewsServiceImplTest {
 			verify(newsRepository, times(1)).readById(request.id());
 			verify(authorRepository, times(0)).readById(request.authorId());
 			verify(newsRepository, times(0)).update(any());
+		}
+
+		@Test
+		void update_shouldThrowEntityConstraintViolationServiceException_whenTitleAlreadyExists() {
+			final long id = 1L;
+			final NewsRequestDto request = new NewsRequestDto(
+				id,
+				"Conflicting title",
+				"Some updated content",
+				2L,
+				new ArrayList<>()
+			);
+			final LocalDateTime date = LocalDateTime.now();
+			final News oldState = new News(id, "Old title", "Old content",
+				date, date, Util.createTestAuthor(2L), new ArrayList<>(), new ArrayList<>());
+			when(authorRepository.readById(request.authorId()))
+				.thenReturn(Optional.of(Util.createTestAuthor(request.authorId())));
+			when(newsRepository.readById(request.id())).thenReturn(Optional.of(oldState));
+			final News newsRequest = Util.dtoToNews(request);
+			when(newsMapper.dtoToModel(request)).thenReturn(newsRequest);
+			when(newsRepository.update(any())).thenThrow(
+				new EntityConstraintViolationRepositoryException("Constraint violation"));
+
+			assertThrows(EntityConstraintViolationServiceException.class,
+				() -> newsService.update(request));
 		}
 
 		@Test

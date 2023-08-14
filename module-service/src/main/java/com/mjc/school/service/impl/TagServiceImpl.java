@@ -2,12 +2,14 @@ package com.mjc.school.service.impl;
 
 import com.mjc.school.repository.NewsRepository;
 import com.mjc.school.repository.TagRepository;
+import com.mjc.school.repository.exception.EntityConstraintViolationRepositoryException;
 import com.mjc.school.repository.model.News;
 import com.mjc.school.repository.model.Tag;
 import com.mjc.school.repository.query.NewsSearchQueryParams;
 import com.mjc.school.service.TagService;
 import com.mjc.school.service.dto.TagRequestDto;
 import com.mjc.school.service.dto.TagResponseDto;
+import com.mjc.school.service.exception.EntityConstraintViolationServiceException;
 import com.mjc.school.service.exception.EntityNotFoundException;
 import com.mjc.school.service.mapper.TagMapper;
 import com.mjc.school.service.validator.annotation.Min;
@@ -23,6 +25,7 @@ import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 import static com.mjc.school.service.constants.Constants.NEWS_ENTITY_NAME;
 import static com.mjc.school.service.constants.Constants.TAG_ENTITY_NAME;
 import static com.mjc.school.service.exception.ServiceErrorCode.ENTITY_NOT_FOUND_BY_ID;
+import static com.mjc.school.service.exception.ServiceErrorCode.TAG_CONSTRAINT_VIOLATION;
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -82,18 +85,35 @@ public class TagServiceImpl implements TagService {
 
 	@Override
 	@Transactional
-	public TagResponseDto create(@NotNull @Valid final TagRequestDto request) {
-		final Tag tag = tagRepository.create(tagMapper.dtoToModel(request));
-		return tagMapper.modelToDto(tag);
+	public TagResponseDto create(@NotNull @Valid final TagRequestDto request)
+			throws EntityConstraintViolationServiceException {
+		try {
+			return tagMapper.modelToDto(tagRepository.create(tagMapper.dtoToModel(request)));
+		} catch (final EntityConstraintViolationRepositoryException e) {
+			throw new EntityConstraintViolationServiceException(
+				TAG_CONSTRAINT_VIOLATION.getMessage(),
+				TAG_CONSTRAINT_VIOLATION.getCode()
+			);
+		}
 	}
 
 	@Override
 	@Transactional
-	public TagResponseDto update(@NotNull @Valid final TagRequestDto request) {
+	public TagResponseDto update(@NotNull @Valid final TagRequestDto request)
+			throws EntityConstraintViolationServiceException {
 		final Long id = request.id();
 		if (id != null && tagRepository.existById(id)) {
 			final Tag tag = tagMapper.dtoToModel(request);
-			return tagMapper.modelToDto(tagRepository.update(tag));
+			final Tag result;
+			try {
+				result = tagRepository.update(tag);
+			} catch (final EntityConstraintViolationRepositoryException e) {
+				throw new EntityConstraintViolationServiceException(
+					TAG_CONSTRAINT_VIOLATION.getMessage(),
+					TAG_CONSTRAINT_VIOLATION.getCode()
+				);
+			}
+			return tagMapper.modelToDto(result);
 		} else {
 			throw new EntityNotFoundException(
 				String.format(ENTITY_NOT_FOUND_BY_ID.getMessage(), TAG_ENTITY_NAME, id),
@@ -109,7 +129,7 @@ public class TagServiceImpl implements TagService {
 			NewsSearchQueryParams params =
 				new NewsSearchQueryParams(null, List.of(id), null, null, null);
 			final List<News> newsWithTag = newsRepository.readByParams(params);
-			for (News news : newsWithTag) {
+			for (final News news : newsWithTag) {
 				news.getTags().removeIf(t -> id.equals(t.getId()));
 				newsRepository.update(news);
 			}

@@ -1,13 +1,16 @@
 package com.mjc.school.repository.impl;
 
 import com.mjc.school.repository.BaseRepository;
+import com.mjc.school.repository.exception.EntityConstraintViolationRepositoryException;
 import com.mjc.school.repository.model.BaseEntity;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -46,7 +49,7 @@ public abstract class AbstractRepository<T extends BaseEntity<K>, K> implements 
 		final CriteriaQuery<T> query = criteriaBuilder.createQuery(entityClass);
 		final Root<T> entity = query.from(entityClass);
 
-		CriteriaQuery<T> select;
+		final CriteriaQuery<T> select;
 		if ("desc".equalsIgnoreCase(direction)) {
 			select = query.select(entity).orderBy(criteriaBuilder.desc(entity.get(field)));
 		} else {
@@ -75,7 +78,14 @@ public abstract class AbstractRepository<T extends BaseEntity<K>, K> implements 
 				entityManager.persist(entity);
 				transactionManager.commit(transactionStatus);
 				return entity;
-			} catch (Exception e) {
+			} catch (final PersistenceException ex) {
+				if (ConstraintViolationException.class.equals(ex.getCause().getClass())) {
+					transactionManager.rollback(transactionStatus);
+					throw new EntityConstraintViolationRepositoryException(ex.getMessage());
+				} else {
+					throw ex;
+				}
+			} catch (final Exception e) {
 				transactionManager.rollback(transactionStatus);
 				throw e;
 			}
@@ -85,19 +95,19 @@ public abstract class AbstractRepository<T extends BaseEntity<K>, K> implements 
 
 	@Override
 	public T update(final T entity) {
-		final var transactionDefinition = new DefaultTransactionDefinition();
-		final var transactionStatus = transactionManager.getTransaction(transactionDefinition);
 		if (entity != null && existById(entity.getId())) {
+			final var transactionDefinition = new DefaultTransactionDefinition();
+			final var transactionStatus = transactionManager.getTransaction(transactionDefinition);
 			try {
 				entityManager.merge(entity);
+				entityManager.flush();
 				transactionManager.commit(transactionStatus);
 				return entityManager.find(entityClass, entity.getId());
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				transactionManager.rollback(transactionStatus);
 				throw e;
 			}
 		}
-		transactionManager.rollback(transactionStatus);
 		return null;
 	}
 
@@ -111,7 +121,7 @@ public abstract class AbstractRepository<T extends BaseEntity<K>, K> implements 
 				entityManager.remove(entity.get());
 				transactionManager.commit(transactionStatus);
 				return !existById(id);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				transactionManager.rollback(transactionStatus);
 				throw e;
 			}

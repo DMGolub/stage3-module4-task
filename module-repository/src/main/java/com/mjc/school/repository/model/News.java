@@ -32,7 +32,7 @@ public class News implements BaseEntity<Long> {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "news_id")
 	private Long id;
-	@Column(name = "news_title", nullable = false)
+	@Column(name = "news_title", nullable = false, unique = true)
 	private String title;
 	@Column(name = "news_content", nullable = false)
 	private String content;

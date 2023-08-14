@@ -1,6 +1,7 @@
 package com.mjc.school.controller.impl;
 
 import com.mjc.school.controller.BaseController;
+import com.mjc.school.controller.versioning.ApiVersion;
 import com.mjc.school.service.CommentService;
 import com.mjc.school.service.dto.CommentRequestDto;
 import com.mjc.school.service.dto.CommentResponseDto;
@@ -8,6 +9,7 @@ import com.mjc.school.service.validator.annotation.Min;
 import com.mjc.school.service.validator.annotation.NotNull;
 import com.mjc.school.service.validator.annotation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,16 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.mjc.school.controller.constants.Constants.API_V1_VERSION;
-import static com.mjc.school.controller.impl.CommentController.BASE_URI;
+import static com.mjc.school.controller.constants.Constants.API_ROOT_PATH;
+import static com.mjc.school.controller.constants.Constants.COMMENT_ROOT_PATH;
+import static com.mjc.school.controller.constants.Constants.NEWS_ROOT_PATH;
 import static com.mjc.school.service.constants.Constants.ID_MIN_VALUE;
 
 @RestController
-@RequestMapping(value = BASE_URI, produces = {"application/JSON"})
+@ApiVersion(1)
+@RequestMapping(path = API_ROOT_PATH, produces = {"application/JSON"})
 public class CommentController implements BaseController<CommentResponseDto, CommentRequestDto, Long> {
-
-	public static final String BASE_URI = "/api/" + API_V1_VERSION;
-	public static final String ENTITY_BASE_URI = "/comments";
 
 	private final CommentService commentService;
 
@@ -40,7 +41,7 @@ public class CommentController implements BaseController<CommentResponseDto, Com
 	}
 
 	@Override
-	@GetMapping(ENTITY_BASE_URI)
+	@GetMapping(COMMENT_ROOT_PATH)
 	public ResponseEntity<List<CommentResponseDto>> readAll(
 		@RequestParam(defaultValue = "10", required = false) @Min(1) final int limit,
 		@RequestParam(defaultValue = "0", required = false) @Min(0) final int offset,
@@ -50,14 +51,14 @@ public class CommentController implements BaseController<CommentResponseDto, Com
 	}
 
 	@Override
-	@GetMapping(ENTITY_BASE_URI + "/{id:\\d+}")
+	@GetMapping(COMMENT_ROOT_PATH + "/{id:\\d+}")
 	public ResponseEntity<CommentResponseDto> readById(
 		@PathVariable @NotNull @Min(ID_MIN_VALUE) final Long id
 	) {
 		return ResponseEntity.ok(commentService.readById(id));
 	}
 
-	@GetMapping("/news/{newsId:\\d+}/comments")
+	@GetMapping(NEWS_ROOT_PATH + "/{newsId:\\d+}/comments")
 	public ResponseEntity<List<CommentResponseDto>> readCommentsByNewsId(
 		@PathVariable("newsId") @NotNull @Min(ID_MIN_VALUE) final Long newsId
 	) {
@@ -65,7 +66,7 @@ public class CommentController implements BaseController<CommentResponseDto, Com
 	}
 
 	@Override
-	@PostMapping(ENTITY_BASE_URI)
+	@PostMapping(path = COMMENT_ROOT_PATH, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<CommentResponseDto> create(
 		@RequestBody @Valid final CommentRequestDto request
@@ -74,7 +75,7 @@ public class CommentController implements BaseController<CommentResponseDto, Com
 	}
 
 	@Override
-	@PatchMapping(ENTITY_BASE_URI + "/{id:\\d+}")
+	@PatchMapping(path = COMMENT_ROOT_PATH + "/{id:\\d+}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CommentResponseDto> update(
 		@PathVariable Long id,
 		@RequestBody @Valid final CommentRequestDto request
@@ -86,7 +87,7 @@ public class CommentController implements BaseController<CommentResponseDto, Com
 	}
 
 	@Override
-	@DeleteMapping(ENTITY_BASE_URI + "/{id:\\d+}")
+	@DeleteMapping(COMMENT_ROOT_PATH + "/{id:\\d+}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteById(@PathVariable @NotNull @Min(ID_MIN_VALUE) final Long id) {
 		commentService.deleteById(id);
